@@ -1,0 +1,208 @@
+{
+  "meta": {
+    "generatedAt": "2026-10-08T12:01:26.272Z",
+    "rangeLabel": "all",
+    "agents": [
+      "claude"
+    ],
+    "projectFilter": "all",
+    "totals": {
+      "sessions": 1,
+      "durationMs": 935270,
+      "turns": 4,
+      "files": 8,
+      "netLines": 443,
+      "toolCallsTotal": 9,
+      "toolSuccessRate": 100,
+      "totalCostUSD": 0.310569,
+      "cacheReadCostUSD": 0.0055850000000000006,
+      "pricedSessions": 1
+    },
+    "unpricedModels": [],
+    "estimatedModels": [],
+    "localModels": [],
+    "coverage": [
+      {
+        "agentName": "claude",
+        "total": 1,
+        "priced": 1,
+        "withLog": 1
+      }
+    ],
+    "userEmail": "aleksander_siudek@epam.com",
+    "periodStart": "2026-10-08T11:45:48.513Z",
+    "periodEnd": "2026-10-08T12:01:23.783Z"
+  },
+  "sessions": [
+    {
+      "sessionId": "1c4b7a4e-d009-4012-8d77-0b9fe4ebf301",
+      "agentName": "claude",
+      "provider": "ai-run-sso",
+      "title": "Base directory for this skill: /home/aleksanderiudek/git/ai-sdlc-task/demo/.claude/skills/plan ## Preflight TASK.md present: yes ## Task Read `TASK.md` and inspect the repository, then produce `context/PLAN.md` following the rules in your agent definition. If `context/PLAN_REVIEW.md` exists, run in revision mode instead.",
+      "project": "/home/aleksanderiudek/git/ai-sdlc-task/demo",
+      "branch": "master",
+      "startTime": 1791459948513,
+      "durationMs": 935270,
+      "turns": 4,
+      "fileOps": 8,
+      "linesAdded": 443,
+      "linesRemoved": 0,
+      "linesModified": 0,
+      "netLines": 443,
+      "filesChanged": 1,
+      "filesWritten": 1,
+      "filesEdited": 0,
+      "toolCallsTotal": 9,
+      "toolCallsSuccess": 9,
+      "toolCallsFailure": 0,
+      "models": [
+        "claude-sonnet-5-5"
+      ],
+      "languages": [
+        "markdown",
+        "yaml",
+        "java"
+      ],
+      "tools": [
+        {
+          "toolName": "Read",
+          "totalCalls": 5,
+          "successCount": 5,
+          "failureCount": 0,
+          "successRate": 100
+        },
+        {
+          "toolName": "Glob",
+          "totalCalls": 3,
+          "successCount": 3,
+          "failureCount": 0,
+          "successRate": 100
+        },
+        {
+          "toolName": "Write",
+          "totalCalls": 1,
+          "successCount": 1,
+          "failureCount": 0,
+          "successRate": 100
+        }
+      ],
+      "tokens": {
+        "input": 8,
+        "output": 18866,
+        "cacheRead": 27925,
+        "cacheCreation": 29077,
+        "cacheCreation1h": 29077,
+        "total": 75876
+      },
+      "costUSD": 0.310569,
+      "cacheReadCostUSD": 0.0055850000000000006,
+      "perModelCost": [
+        {
+          "model": "claude-sonnet-5-5",
+          "tokens": {
+            "input": 4,
+            "output": 1182,
+            "cacheRead": 11586,
+            "cacheCreation": 22826,
+            "cacheCreation1h": 22826,
+            "total": 35598
+          },
+          "costUSD": 0.10544919999999999,
+          "unpriced": false
+        },
+        {
+          "model": "claude-sonnet-5-5",
+          "tokens": {
+            "input": 4,
+            "output": 17684,
+            "cacheRead": 16339,
+            "cacheCreation": 6251,
+            "cacheCreation1h": 6251,
+            "total": 40278
+          },
+          "costUSD": 0.2051198,
+          "unpriced": false
+        }
+      ],
+      "hadLog": true,
+      "agentSessionFile": "/home/aleksanderiudek/.claude/projects/-home-aleksanderiudek-git-ai-sdlc-task-demo/44657d95-d931-4849-888b-56013cd8a506.jsonl",
+      "costSeries": [
+        {
+          "t": 1791459966895,
+          "cost": 0.025794,
+          "tokens": 5782
+        },
+        {
+          "t": 1791459968995,
+          "cost": 0.052111000000000005,
+          "tokens": 17045
+        },
+        {
+          "t": 1791460083072,
+          "cost": 0.2309138,
+          "tokens": 46060
+        },
+        {
+          "t": 1791460543632,
+          "cost": 0.310569,
+          "tokens": 75876
+        }
+      ],
+      "costSource": "native-estimate",
+      "costBasis": "standard-api-tokens",
+      "dispatchesComplete": true,
+      "rootOwnCostUSD": 0,
+      "unlinkedCostUSD": 0.310569,
+      "unlinkedAgentIds": [
+        "ac5f5841ae2bec166"
+      ],
+      "rootOwnTokens": {
+        "input": 0,
+        "output": 0,
+        "cacheRead": 0,
+        "cacheCreation": 0,
+        "cacheCreation1h": 0,
+        "total": 0
+      },
+      "unlinkedTokens": {
+        "input": 8,
+        "output": 18866,
+        "cacheRead": 27925,
+        "cacheCreation": 29077,
+        "cacheCreation1h": 29077,
+        "total": 75876
+      },
+      "modelTimeline": [
+        {
+          "t": 1791459966895,
+          "model": "claude-sonnet-5-5",
+          "costUSD": 0.025794,
+          "tokens": 5782
+        },
+        {
+          "t": 1791459968995,
+          "model": "claude-sonnet-5-5",
+          "costUSD": 0.026317,
+          "tokens": 11263
+        },
+        {
+          "t": 1791460083072,
+          "model": "claude-sonnet-5-5",
+          "costUSD": 0.1788028,
+          "tokens": 29015
+        },
+        {
+          "t": 1791460543632,
+          "model": "claude-sonnet-5-5",
+          "costUSD": 0.0796552,
+          "tokens": 29816
+        }
+      ],
+      "routedTurnsPct": 0,
+      "skillInvocations": [],
+      "agentInvocations": [],
+      "commandInvocations": [],
+      "sessionSource": "Pure chat"
+    }
+  ]
+}
