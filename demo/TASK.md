@@ -66,7 +66,7 @@ BOOKED, CHECKED_IN → CANCELLED
 | T-6 | READY | PAID | admin | balance == 0 | no |
 | T-7 | PAID | CLOSED | admin | — | no |
 | T-8 | BOOKED, CHECKED_IN | CANCELLED | admin | reason required | yes |
-| T-9 | any non-terminal → previous state | admin | reason required | yes |
+| T-9 | any non-terminal | previous state | admin | reason required | yes |
 
 Any transition not listed above is rejected with HTTP 409.
 
