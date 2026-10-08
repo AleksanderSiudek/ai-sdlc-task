@@ -33,7 +33,7 @@ referenced in scope and criteria alongside the `BR-*`, `A-*` and `AC-*` ids.
 | BR-9 | INC-9, INC-15 |
 | BR-10 | INC-3, INC-5, INC-15 |
 | A-1 | INC-13, INC-14 |
-| A-2 | INC-9 |
+| A-2 | INC-9, INC-13 |
 | A-3 | INC-12 |
 | A-4 | INC-11 |
 | A-5 | INC-14 |
@@ -66,6 +66,9 @@ referenced in scope and criteria alongside the `BR-*`, `A-*` and `AC-*` ids.
 - Money is `BigDecimal` with scale 2.
 - Do not add endpoints, fields or rules beyond what the increment lists. Anything
   undefined goes to `## Open questions`.
+- "Writes no AuditEntry" can only be asserted once the `AuditEntry` entity exists
+  (INC-13). Earlier increments therefore do not carry such criteria; INC-13 asserts it
+  for every unaudited transition.
 
 ## Increments
 
@@ -160,7 +163,7 @@ referenced in scope and criteria alongside the `BR-*`, `A-*` and `AC-*` ids.
 
 - **Status:** pending
 - **Goal:** Pets can be found by name or chip number and soft-deleted without removing the row.
-- **Depends on:** INC-5, INC-4
+- **Depends on:** INC-5
 - **Covers:** BR-6
 - **Scope:**
   - Search endpoint for pets by name or by chip number.
@@ -193,7 +196,7 @@ referenced in scope and criteria alongside the `BR-*`, `A-*` and `AC-*` ids.
 
 - **Status:** pending
 - **Goal:** Reception can book an appointment for a live pet, and appointments (including those of deleted owners and pets) can be read and listed.
-- **Depends on:** INC-6
+- **Depends on:** INC-4, INC-6
 - **Covers:** BR-6, BR-7, A-6, AC-16, AC-17
 - **Scope:**
   - `Appointment` entity with the fields in the domain model: scheduledAt, status, complaint, anamnesis, diagnosis, notes, assignedDoctorId, total. Exactly one Pet per appointment (A-6). `AppointmentStatus` enum with all lifecycle states.
@@ -230,7 +233,7 @@ referenced in scope and criteria alongside the `BR-*`, `A-*` and `AC-*` ids.
   - [ ] `BOOKED` to `CHECKED_IN` with `X-Role: DOCTOR` returns 403 and the status is unchanged.
   - [ ] `CHECKED_IN` to `IN_PROGRESS` returns 200 for ADMIN and for DOCTOR (T-2).
   - [ ] `BOOKED` to `IN_PROGRESS` returns 409 and the status stays `BOOKED` (AC-4).
-  - [ ] `ON_HOLD` to `IN_PROGRESS` returns 200 for ADMIN and for DOCTOR and writes no AuditEntry (T-4, A-2). Setting up an `ON_HOLD` appointment may use direct persistence in the test until INC-10.
+  - [ ] `ON_HOLD` to `IN_PROGRESS` returns 200 for ADMIN and for DOCTOR (T-4, A-2). Setting up an `ON_HOLD` appointment may use direct persistence in the test until INC-10. That T-4 writes no AuditEntry is asserted in INC-13, once the entity exists.
   - [ ] A parameterised unit test of the state machine iterates every `(from, to)` pair of the statuses and asserts that only the registered pairs succeed.
   - [ ] No controller or repository class references `AppointmentStatus` for decision-making (verified by a simple source or reflection test).
   - [ ] `PATCH` on an unknown id returns 404; an unknown status string returns 400.
@@ -251,10 +254,10 @@ referenced in scope and criteria alongside the `BR-*`, `A-*` and `AC-*` ids.
   - [ ] `IN_PROGRESS` to `ON_HOLD` with `X-Role: DOCTOR` and a reason returns 200 (T-3).
   - [ ] `IN_PROGRESS` to `ON_HOLD` with `X-Role: ADMIN` returns 403.
   - [ ] `IN_PROGRESS` to `ON_HOLD` without a reason is rejected and the status is unchanged (status code per the open question).
-  - [ ] `IN_PROGRESS` to `READY` with an empty diagnosis returns 409 and the status stays `IN_PROGRESS` (AC-5).
+  - [ ] `IN_PROGRESS` to `READY` with `X-Role: DOCTOR` and an empty diagnosis returns 409 and the status stays `IN_PROGRESS` (AC-5).
   - [ ] `IN_PROGRESS` to `READY` with a non-empty diagnosis and `X-Role: DOCTOR` returns 200 (T-5).
   - [ ] `IN_PROGRESS` to `READY` with `X-Role: ADMIN` returns 403.
-  - [ ] Neither T-3 nor T-5 creates an AuditEntry (nothing to count yet; asserted again in INC-13).
+  - [ ] That T-3 and T-5 write no AuditEntry is asserted in INC-13, once the entity exists.
 
 ### INC-11 — Line items and totals
 
@@ -294,7 +297,7 @@ referenced in scope and criteria alongside the `BR-*`, `A-*` and `AC-*` ids.
   - Payment amount must be positive (400 otherwise). Whether `paidAt` is client-supplied or server-set, and which statuses accept payments, are open questions.
 - **Completion criteria:**
   - [ ] An appointment with total 100.00 and one payment of 40.00 shows `balance` 60.00 (BR-2).
-  - [ ] `READY` to `PAID` while `balance > 0` returns 409 and the status stays `READY` (AC-3, BR-4).
+  - [ ] `READY` to `PAID` with `X-Role: ADMIN` while `balance > 0` returns 409 and the status stays `READY` (AC-3, BR-4).
   - [ ] A payment of 100.01 against a total of 100.00 returns 409 and no Payment row is created (AC-11, A-3).
   - [ ] A second payment that would take the sum above the total returns 409 even though each payment alone is below the total.
   - [ ] Two payments of 50.00 against a total of 100.00 bring `balance` to 0.00, and `READY` to `PAID` with `X-Role: ADMIN` then returns 200 (AC-12, BR-5).
@@ -306,15 +309,16 @@ referenced in scope and criteria alongside the `BR-*`, `A-*` and `AC-*` ids.
 ### INC-13 — Audit trail and cancellation
 
 - **Status:** pending
-- **Goal:** BOOKED or CHECKED_IN appointments can be cancelled with a reason, the cancellation is audited, and CANCELLED is terminal.
+- **Goal:** BOOKED or CHECKED_IN appointments can be cancelled with a reason, the cancellation is audited, CANCELLED is terminal, and the unaudited transitions are proved to write no AuditEntry.
 - **Depends on:** INC-12
-- **Covers:** BR-8, A-1, AC-6
+- **Covers:** BR-8, A-1, A-2, AC-6
 - **Scope:**
   - `AuditEntry` entity (appointmentId, fromStatus, toStatus, actorRole, reason, occurredAt) and repository.
   - T-8 BOOKED or CHECKED_IN to CANCELLED: ADMIN only, `reason` required, writes exactly one AuditEntry with the actor role, reason and timestamp (BR-8).
   - The AuditEntry is written in the same transaction as the status change. A failed transition writes nothing.
   - CANCELLED has no outgoing transition (A-1); the default 409 from INC-9 covers it.
   - No audit-read endpoint is added, because `TASK.md` does not define one. Tests read the repository.
+  - This is the first increment where the AuditEntry count can be asserted, so it owns the "unaudited" assertions for T-1 to T-7, including T-3, T-4 and T-5 whose own increments (INC-9, INC-10) cannot check it.
 - **Completion criteria:**
   - [ ] `BOOKED` to `CANCELLED` with `X-Role: ADMIN` and a reason returns 200 and exactly one AuditEntry exists with from `BOOKED`, to `CANCELLED`, role `ADMIN`, the reason and a non-null `occurredAt` (T-8, BR-8).
   - [ ] The same from `CHECKED_IN` also works.
@@ -322,7 +326,7 @@ referenced in scope and criteria alongside the `BR-*`, `A-*` and `AC-*` ids.
   - [ ] Cancellation without a reason is rejected, the status is unchanged and no AuditEntry is written (status code per the open question).
   - [ ] Cancellation from `IN_PROGRESS`, `READY`, `PAID` or `CLOSED` returns 409.
   - [ ] Every transition from `CANCELLED` to each of the other statuses returns 409 (AC-6, A-1).
-  - [ ] Transitions T-1 to T-7 create no AuditEntry (the "Audited: no" column).
+  - [ ] Each of T-1 to T-7 (the "Audited: no" column), including T-3, T-4 and T-5 introduced in INC-9 and INC-10, is performed once successfully and afterwards the AuditEntry count is 0. T-4 is the resume of A-2.
 
 ### INC-14 — Rollback (T-9)
 
@@ -440,3 +444,54 @@ neutral defaults stated in the increments.
 22. **Schema management.** No migration tool (Flyway or Liquibase) is in `pom.xml`.
     The plan assumes Hibernate schema generation. Confirm whether migrations are
     wanted.
+
+## Revision log
+
+Revision 1, driven by `context/PLAN_REVIEW.md` and the human decision recorded in its
+"Human review" section: act on F-1, F-8 and F-9 only.
+
+### Applied
+
+- **F-1 — "Writes no AuditEntry" criteria precede the AuditEntry entity.**
+  - INC-9: removed "and writes no AuditEntry" from the T-4 criterion and replaced it with
+    a pointer to INC-13.
+  - INC-10: replaced the "Neither T-3 nor T-5 creates an AuditEntry (nothing to count
+    yet)" criterion with a pointer to INC-13, so no criterion remains that cannot fail.
+  - INC-13: rewrote the "T-1 to T-7 create no AuditEntry" criterion so it explicitly names
+    T-3, T-4 and T-5 and states a checkable procedure (perform each transition once,
+    then assert the AuditEntry count is 0). Added a matching scope line and extended the
+    goal. Added A-2 to INC-13's `Covers` line and to the coverage map, because the
+    unaudited-resume half of A-2 is now asserted there.
+  - Added a convention in "Conventions for every increment" so later edits do not
+    reintroduce audit assertions before INC-13.
+  - Why: the entity and repository are introduced in INC-13, so earlier tests had
+    nothing to count. The reviewer's first suggested fix (move the assertion to INC-13)
+    was chosen over moving the entity earlier, since there was no other reason to move
+    it. INC-14's existing T-4 no-audit criterion is unchanged.
+- **F-8 — Criteria for AC-3 and AC-5 omit the caller role.**
+  - INC-10: the AC-5 criterion now specifies `X-Role: DOCTOR` with the empty diagnosis.
+  - INC-12: the AC-3 criterion now specifies `X-Role: ADMIN`.
+  - Why: each uses the one role permitted for the transition, so the 409 comes from the
+    guard and not from an unresolved 403-versus-409 precedence (open question 5).
+- **F-9 — INC-6 declares an unneeded dependency on INC-4.**
+  - INC-6 now depends on INC-5 only.
+  - INC-8 now depends on INC-4 and INC-6, since its AC-16 criterion uses
+    `DELETE /owners/{id}` from INC-4.
+  - Why: matches which increment actually supplies what each criterion uses. The order
+    stays valid, INC-4 still precedes INC-8.
+
+### Not acted on in this phase
+
+Per the human decision, the following findings are noted and deliberately left
+unchanged. They remain open for a later revision. None was rejected as wrong.
+
+- **F-2** (criteria with no assertable status code, INC-10 and INC-13): not changed.
+  The affected criteria still read "status code per the open question".
+- **F-3** (gating criteria adopt answers to open questions; questions not tied to
+  increments): not changed.
+- **F-4** (INC-14 scope broader than its criteria): not changed.
+- **F-5** (INC-15 matrix depends on unresolved questions): not changed.
+- **F-6** (BR-9 structural test is vague): not changed.
+- **F-7** (manual, vague or conditional criteria): not changed.
+- **F-10** (rules inferred that are not in `TASK.md`): not changed.
+- **F-11** (business rules restated in prose): not changed.
