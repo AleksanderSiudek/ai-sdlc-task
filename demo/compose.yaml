@@ -1,0 +1,10 @@
+services:
+  postgres:
+    image: postgres:17
+    environment:
+      POSTGRES_DB: vetclinic
+      POSTGRES_USER: vetclinic
+      POSTGRES_PASSWORD: vetclinic
+    ports:
+      - "5432:5432"
+ 
